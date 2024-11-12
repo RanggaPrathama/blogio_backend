@@ -9,6 +9,9 @@ import (
 
 
 func UserRoute(app *fiber.App, handler *handler.UserHandler)  {
-	app.Get("/users", handler.FindAll )
+	api := app.Group("/api")
+	user := api.Group("/users")
+	user.Get("/", handler.FindAll )
+	user.Get("/:id", handler.FindByID)
 
 }

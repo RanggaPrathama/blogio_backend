@@ -6,6 +6,7 @@ import (
 )
 
 type UserInterface interface {
-	FindAll(context.Context) ([]entity.User, error)
-	FindByID(context.Context, string) (entity.User, error)
+	FindAll(ctx context.Context) ([]entity.User, error)
+	FindByID(ctx context.Context, id string) (entity.User, error)
+	CreateUser(ctx context.Context) (entity.User, error)
 }

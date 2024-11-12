@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -50,7 +51,22 @@ func (db *UserDatabase) FindByID(c context.Context, id string) (entity.User, err
 
 	var users entity.User
 
-	err := db.collection.FindOne(ctx, bson.M{"_id" : id}).Decode(&users)
+	hex_id, _ := primitive.ObjectIDFromHex(id)
 
+	err := db.collection.FindOne(ctx, bson.M{"_id" : hex_id}).Decode(&users)
+	
 	return users, err
 }	
+
+
+func (db *UserDatabase) CreateUser(c context.Context) (entity.User, error) {
+	
+	ctx, cancel := context.WithTimeout(context.Background(), 10 *time.Second)
+	defer cancel()
+
+	var user entity.User
+
+	_, err := db.collection.InsertOne(ctx, user)
+	
+	return user, err
+}
