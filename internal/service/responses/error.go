@@ -4,7 +4,6 @@ type ErrorResponse struct{
 	ERROR  error
 }
 
-
 func (e ErrorResponse) Error() string{
 	return e.ERROR.Error()
 }

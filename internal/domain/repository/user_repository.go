@@ -58,6 +58,19 @@ func (db *UserDatabase) FindByID(c context.Context, id string) (entity.User, err
 	return users, err
 }	
 
+func (db *UserDatabase) FindByEmail(c context.Context, email string) (entity.User, error){
+	ctx, cancel := context.WithTimeout(context.Background(), 10 *time.Second)
+	defer cancel()
+
+	var user entity.User
+
+     err := db.collection.FindOne(ctx, bson.M{
+		"email": email,
+	}).Decode(&user)
+
+	return user, err
+
+}
 
 func (db *UserDatabase) CreateUser(c context.Context, user entity.User) (entity.User, error) {
 	
@@ -77,4 +90,5 @@ func (db *UserDatabase) CreateUser(c context.Context, user entity.User) (entity.
 	
 	return newUser, err
 }
+
 
