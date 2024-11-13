@@ -18,7 +18,7 @@ func main() {
     app.Get("/", func(c *fiber.Ctx) error {
        return c.SendString("Hello, World!")
     })
-
+    
     // User
     repo := repository.NewUserRepository() 
     service := service.NewUserService(repo)

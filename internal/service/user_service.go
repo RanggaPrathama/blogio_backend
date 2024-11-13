@@ -1,9 +1,10 @@
 package service
 
 import (
+	"blogio/helper"
 	"blogio/internal/domain/entity"
-	Uservice "blogio/internal/service/interfaces"
 	Urepository "blogio/internal/domain/repository/interfaces"
+	Uservice "blogio/internal/service/interfaces"
 	"blogio/internal/service/responses"
 	"context"
 )
@@ -41,8 +42,15 @@ func (u *User_service) FindByID(c context.Context, id string) (entity.User, erro
 }
 
 
-func (u *User_service) CreateUser(c context.Context) (entity.User, error) {
-	users, err := u.userRepo.CreateUser(c)
+func (u *User_service) CreateUser(c context.Context, user entity.User) (entity.User, error) {
+	hashedPassword, err := helper.GeneratePassword(user.PASSWORD)
+	if err != nil {
+		return user, responses.NewErrorNotFound(err)
+	}
+	
+	user.PASSWORD = hashedPassword
+
+	users, err := u.userRepo.CreateUser(c, user)
 	if err != nil {
 		return users, responses.NewErrorNotFound(err)
 	}

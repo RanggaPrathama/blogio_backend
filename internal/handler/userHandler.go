@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"blogio/helper"
+	"blogio/internal/domain/entity"
 	"blogio/internal/handler/responses"
 	Uservice "blogio/internal/service/interfaces"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -56,3 +59,64 @@ func (handler *UserHandler) FindByID(c *fiber.Ctx) error{
 			Data: user,
 		})
 }
+
+//var validate = validator.New()
+
+func (handler *UserHandler) CreateUser (c *fiber.Ctx) error {
+	
+	Validator := helper.NewValidator()
+
+	// user := new(entity.User)
+
+	var user entity.User
+
+	if err := c.BodyParser(&user); err != nil {
+
+		return c.Status(fiber.StatusBadRequest).JSON(helper.ErrorResponse{
+			Error:       true,
+			FailedField: "Body Parsing",
+			Tag:         "parse_error",
+			Value:       err.Error(),
+		})
+	}
+
+	if errs := Validator.Validator(user); len(errs)> 0 {
+		errorMessage := make([]string,0)
+
+		for _, err := range errs {
+			errorMessage = append(errorMessage,fmt.Sprintf(
+				"Error on field %s, condition %s, value %s",
+				err.FailedField,
+				err.Tag,
+				err.Value,
+			) )
+		}
+
+	
+		return c.Status(fiber.StatusBadRequest).JSON(helper.ErrorResponse{
+			Error:       true,
+			FailedField: "Validation",
+			Tag:         "validation_error",
+			Value:       errorMessage,
+		})
+	}
+	
+	users, err := handler.userService.CreateUser(c.Context(), user)
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+			Status: fiber.StatusInternalServerError,
+			Message: "Failed to create user",
+			Data:  err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(responses.Response{
+		Status: fiber.StatusOK,
+		Message: "Berhasil Create data",
+		Data: users,
+	})
+	
+}
+
+

@@ -7,3 +7,10 @@ type Response struct{
 	Data interface{} `json:"data"`
 }
 
+type ErrorResponses struct {
+	Error       bool
+	FailedField string
+	Tag         string
+	Value       interface{}
+}
+

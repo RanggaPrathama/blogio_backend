@@ -13,5 +13,5 @@ func UserRoute(app *fiber.App, handler *handler.UserHandler)  {
 	user := api.Group("/users")
 	user.Get("/", handler.FindAll )
 	user.Get("/:id", handler.FindByID)
-
+	user.Post("/create", handler.CreateUser)
 }

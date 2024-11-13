@@ -59,14 +59,22 @@ func (db *UserDatabase) FindByID(c context.Context, id string) (entity.User, err
 }	
 
 
-func (db *UserDatabase) CreateUser(c context.Context) (entity.User, error) {
+func (db *UserDatabase) CreateUser(c context.Context, user entity.User) (entity.User, error) {
 	
 	ctx, cancel := context.WithTimeout(context.Background(), 10 *time.Second)
 	defer cancel()
 
-	var user entity.User
+	// var user entity.User
 
-	_, err := db.collection.InsertOne(ctx, user)
+	newUser := entity.User{
+		ID: primitive.NewObjectID(),
+		USERNAME: user.USERNAME,
+		EMAIL: user.EMAIL,
+		PASSWORD: user.PASSWORD,
+	}
+
+	_ , err := db.collection.InsertOne(ctx, newUser)
 	
-	return user, err
+	return newUser, err
 }
+

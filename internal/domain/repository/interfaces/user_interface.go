@@ -8,5 +8,5 @@ import (
 type UserRepository interface {
 	FindAll(ctx context.Context) ([]entity.User, error)
 	FindByID(ctx context.Context, id string) (entity.User, error)
-	CreateUser(ctx context.Context) (entity.User, error)
+	CreateUser(ctx context.Context, user entity.User) (entity.User, error)
 }

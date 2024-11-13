@@ -12,3 +12,4 @@ func (e ErrorResponse) Error() string{
 func NewErrorNotFound(err error) error {
 	return &ErrorResponse{ERROR: err}
 }
+
