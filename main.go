@@ -24,7 +24,7 @@ func main() {
     service := service.NewUserService(repo)
     handler := handler.NewUserHandler(service)   
     routes.UserRoute(app, handler)
-
+    
     
     
     app.Listen(config.LoadEnv("PORT"))

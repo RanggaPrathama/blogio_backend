@@ -62,7 +62,7 @@ func (handler *UserHandler) FindByID(c *fiber.Ctx) error{
 
 //var validate = validator.New()
 
-func (handler *UserHandler) CreateUser (c *fiber.Ctx) error {
+func (handler *UserHandler) CreateUser(c *fiber.Ctx) error {
 	
 	Validator := helper.NewValidator()
 
@@ -120,3 +120,72 @@ func (handler *UserHandler) CreateUser (c *fiber.Ctx) error {
 }
 
 
+func (handler *UserHandler ) UpdateUser(c *fiber.Ctx) error {
+	var user entity.User
+	Validator := helper.NewValidator()
+
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(helper.ErrorResponse{
+			Error:       true,
+			FailedField: "Body Parsing",
+			Tag:         "parse_error",
+			Value:       err.Error(),
+		})
+	}
+
+	if errs := Validator.Validator(user); len(errs)>0{
+		errorMessage := make([]string,0)
+
+		for _,err := range errs{
+			errorMessage = append(errorMessage, fmt.Sprintf(
+				"Error on field %s, condition %s, value %s",
+				err.FailedField,
+				err.Tag,
+				err.Value,
+			))
+		}
+		
+		return c.Status(fiber.StatusBadRequest).JSON(helper.ErrorResponse{
+			Error:       true,
+			FailedField: "Validation",
+			Tag:         "validation_error",
+			Value:       errorMessage,
+		})
+	}
+
+		response , err := handler.userService.UpdateUser(c.Context(), c.Params("id"), user)
+
+		if err != nil{
+			return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+				Status: fiber.StatusInternalServerError,
+				Message: "Failed to update user",
+				Data:  err.Error(),
+			})
+		}
+
+		return c.Status(fiber.StatusOK).JSON(responses.Response{
+			Status: fiber.StatusOK,
+			Message: "Berhasil update data",
+			Data: response,
+		})
+
+}
+
+
+func (handler *UserHandler) DeleteUser(c *fiber.Ctx) error {
+	err := handler.userService.DeleteUser(c.Context(), c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(responses.Response{
+			Status: fiber.StatusInternalServerError,
+			Message: "Failed to delete user",
+			Data:  err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(responses.Response{
+		Status: fiber.StatusOK,
+		Message: "Berhasil delete data",
+		Data: "Data berhasil dihapus",
+	})
+
+}

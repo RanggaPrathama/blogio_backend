@@ -43,10 +43,7 @@ func (u *User_service) CreateUser(c context.Context, user entity.User) (entity.U
 
 	existUser, _ := u.userRepo.FindByEmail(c, user.EMAIL)
 	 fmt.Println(existUser)
-	// if err != nil && err != mongo.ErrNoDocuments {
-	// 	return user, responses.NewErrorNotFound(err)
-	// }
-
+	
 	if existUser.EMAIL == user.EMAIL {
 		return user,  responses.NewErrorNotFound(fmt.Errorf("email already exists"))
 	}
@@ -64,4 +61,53 @@ func (u *User_service) CreateUser(c context.Context, user entity.User) (entity.U
 	}
 
 	return users, err
+}
+
+
+func (u *User_service) UpdateUser(c context.Context, id string, user entity.User) (entity.User, error){
+
+	hashedPassword, err := helper.GeneratePassword(user.PASSWORD)
+	if err != nil {
+		return user, responses.NewErrorNotFound(err)
+	}
+
+	user.PASSWORD = hashedPassword
+
+	usersID, err := u.FindByID(c, id)
+
+	if err != nil {
+		return usersID, responses.NewErrorNotFound(fmt.Errorf("user not found"))
+	}
+
+	id = usersID.ID.Hex()
+
+	users, err := u.userRepo.UpdateUser(c, id, user)
+
+	if err != nil {
+		return users, responses.NewErrorNotFound(err)
+	}
+
+	return users, err 
+
+}
+
+func (u *User_service) DeleteUser(c context.Context, id string) error {
+
+	usersID, err := u.userRepo.FindByID(c, id)
+
+	fmt.Println("USERS ID", usersID)
+
+	if err != nil {
+		return responses.NewErrorNotFound(fmt.Errorf("user not found"))
+	}
+
+	err = u.userRepo.DeleteUser(c, usersID.ID.Hex())
+
+	fmt.Println("ERROR", err)
+	if err != nil {
+		return responses.NewErrorNotFound(err)
+	}
+
+	return err
+
 }
