@@ -21,10 +21,14 @@ func main() {
     
     // User
     repo := repository.NewUserRepository() 
-    service := service.NewUserService(repo)
-    handler := handler.NewUserHandler(service)   
-    routes.UserRoute(app, handler)
-    
+    serviceUser := service.NewUserService(repo)
+    handlerUser := handler.NewUserHandler(serviceUser)   
+    routes.UserRoute(app, handlerUser)
+
+    // Auth 
+    serviceAuth := service.NewAuthService(repo)
+    handlerAuth := handler.NewAuthHandler(serviceAuth)
+    routes.AuthRoute(app, handlerAuth)
     
     
     app.Listen(config.LoadEnv("PORT"))

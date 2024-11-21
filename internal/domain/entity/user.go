@@ -11,3 +11,8 @@ type User struct {
 	PHOTO         string             `json:"photo,omitempty" bson:"photo,omitempty"`
 	PHONE         string             `json:"phone,omitempty" bson:"phone,omitempty"`
 }
+
+type LoginStruct struct{
+	User User
+	Token string
+}
